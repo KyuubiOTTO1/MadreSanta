@@ -4,26 +4,20 @@ from urllib.parse import urlparse
 def get_domains(pastebin_url):
  """
  Recupera il contenuto del Pastebin con i domini.
- :param pastebin_url: URL del Pastebin da cui recuperare i domini.
- :return: Lista dei domini dal file Pastebin.
  """
  try:
  response = requests.get(pastebin_url)
  response.raise_for_status()
  domains = response.text.strip().split('\n')
- domains = [domain.strip().replace('\r', '') for domain in domains]
+ domains = [domain.strip().replace('\r', '') for domain in
  return domains
  except requests.RequestException as e:
  print(f"Errore durante il recupero dei domini: {e}")
  return []
 def extract_full_domain(domain, site_key):
  """
- Estrae il dominio completo da un URL con https:// e www. per Tantifilm e
-StreamingWatch,
+ Estrae il dominio completo da un URL con https:// e www. per T
  mentre per gli altri solo con https://.
- :param domain: Dominio da analizzare.
- :param site_key: Nome del sito per decidere il prefisso.
- :return: Dominio completo con schema e www. se richiesto.
  """
  parsed_url = urlparse(domain)
  scheme = parsed_url.scheme if parsed_url.scheme else 'https'
@@ -36,11 +30,7 @@ StreamingWatch,
  return f"https://{netloc}"
 def check_redirect(domain, site_key):
  """
- Verifica se un dominio fa un redirect e restituisce il dominio finale
-completo con https:// e www.
- :param domain: Dominio da verificare.
- :param site_key: Nome del sito per decidere il prefisso.
- :return: Tuple con l'URL originale e il dominio finale completo.
+ Verifica se un dominio fa un redirect e restituisce il dominio
  """
  if not domain.startswith(('http://', 'https://')):
  domain = 'http://' + domain
@@ -53,8 +43,7 @@ completo con https:// e www.
  return domain, f"Error: {str(e)}"
 def update_json_file():
  """
- Aggiorna il file JSON con i domini finali (post-redirect) recuperati da
-Pastebin.
+ Aggiorna il file config.json con i domini aggiornati.
  """
  try:
  with open('config.json', 'r', encoding='utf-8') as file:
@@ -66,11 +55,11 @@ Pastebin.
  print("Errore: Il file config.json non è un JSON valido.")
  return
  streamingcommunity_url = 'https://pastebin.com/raw/KgQ4jTy6'
- streamingcommunity_domains = get_domains(streamingcommunity_url)
+ streamingcommunity_domains = get_domains(streamingcommunity_ur
  general_pastebin_url = 'https://pastebin.com/raw/E8WAhekV'
  general_domains = get_domains(general_pastebin_url)
  if not general_domains or not streamingcommunity_domains:
- print("Lista dei domini vuota. Controlla i link di Pastebin.")
+ print("Lista dei domini vuota. Controlla i link di Pastebi
  return
  site_mapping = {
  'StreamingCommunity': streamingcommunity_domains[0],
@@ -88,9 +77,9 @@ Pastebin.
  }
  for site_key, domain_url in site_mapping.items():
  if site_key in data['Siti']:
- original, final_domain = check_redirect(domain_url, site_key)
+ original, final_domain = check_redirect(domain_url, si
  if "Error" in final_domain:
- print(f"Errore nel redirect di {original}: {final_domain}")
+ print(f"Errore nel redirect di {original}: {final_
  continue
  data['Siti'][site_key]['url'] = final_domain
  print(f"Aggiornato {site_key}: {final_domain}")
